@@ -1,1 +1,17 @@
-/home/andreas/https/books/pdftopng.psp
+<%
+from subprocess import Popen, PIPE
+
+if 'pdf' in form and 'page' in form:
+	pdf = form['pdf']
+	page = form['page']
+	cmd = "convert -density 100 -colorspace HWB '%s[%d]' png:-" % (pdf, int(page))
+	cwd = "/var/www/https/books"
+	p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, cwd=cwd)
+
+	req.content_type = 'image/png'
+	req.no_cache = False
+	req.headers_out.add("Expires", "Fri, 1 Jan 2038 05:00:00 GMT")
+	req.write(p.communicate()[0])
+else:
+	req.write("hello, world!")
+%>

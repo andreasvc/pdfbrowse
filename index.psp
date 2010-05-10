@@ -1,1 +1,76 @@
-/home/andreas/https/books/index.psp
+<%
+req.no_cache = False
+req.headers_out.add("Expires", "Fri, 1 Jan 2038 05:00:00 GMT")
+%>
+<html><head><title>UNSTABLE | books</title>
+<script language="javascript" type="text/javascript" src="/javascript/jquery/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="jquery.lazyload.js"></script>
+<script type="text/javascript" charset="utf-8">                           
+      $(function() {                                                        
+          $("img").lazyload({placeholder : "img/grey.gif"});                
+      });                                                                   
+</script>  
+</head><body bgcolor="gray">
+<center>
+<%
+from glob import glob
+from subprocess import Popen, PIPE
+import os
+if 'pdf' in form:
+	pdf = form['pdf']
+	cmd = "pdfinfo \"%s\"" % pdf
+	cwd = "/var/www/https/books"
+	p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, cwd=cwd)
+	results, err = p.communicate()
+	req.write("<!-- cmd: %s, stdout: %s\nstderr: %s -->" % (cmd, results, err))
+	results = dict(a.split(':', 1) for a in results.split('\n') if ':' in a)
+	try:
+		pages = int(results['Pages'].strip()) #fixme
+	except KeyError:
+		pages = 100
+	try:
+		width, height = results['Page size'].split("x")
+		width, height = float(width.strip()), float(height.split()[0])
+		if int(width) < 1024:
+			scale = float(1024) / width
+			width, height = scale * width, scale * height
+		width, height = map(int, (width, height))
+		width, height = map(str, (width, height))
+	except KeyError:
+		width, height = "100%", "100%"
+
+	%>
+	Jump to:
+<%
+	for page in map(str, range(pages)): %>
+		<a href="#<%= page %>"><%= page %></a>
+<%	
+	for page in map(str, range(pages)): %>
+		<a name="<%= page %>"><img src="pdftopng.psp?pdf=<%= pdf %>&page=<%= page %>" width="<%= width %>" height="<%= height %>"></a>
+		<br>
+	
+<%
+	#end
+%>	
+	<a href="<%= pdf %>">PDF</a>
+	<%
+else:
+%>
+	<table width="60%" bgcolor="#ffffff"><tr><td>
+	<center><img src="/images/cubes3.jpg"><br>
+	<strong>books</strong> beta<br><br>
+	<form method=get submit=search.psp>
+	<input type=text> <input type=submit value=search>
+	</form></center>
+	<ul>
+	<% os.chdir("/var/www/https/books/") 
+	for a in glob("*.pdf"): %>
+			<a href="index.psp?pdf=<%= a %>"><img src="pdf.png" valign=middle><%= a %></a>
+			(<a href="http://docs.google.com/viewer?url=https://unstable.nl/books/<%= a %>">google quickview</a>) <br>
+	
+	<%
+	# end
+%>	
+</ul></td></tr></table>
+</center>
+</body></html>
