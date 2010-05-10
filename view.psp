@@ -1,0 +1,60 @@
+<%
+# a script to display PDF files online.
+req.no_cache = False
+req.headers_out.add("Expires", "Fri, 1 Jan 2038 05:00:00 GMT")
+if 'pdf' in form:
+	pdf = form['pdf']
+else: pdf = "foo?"
+%>
+<html><head><title><%= pdf %></title>
+<script language="javascript" type="text/javascript" src="/javascript/jquery/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="jquery.lazyload.js"></script>
+<script type="text/javascript" charset="utf-8">                           
+      $(function() {                                                        
+          $("img").lazyload({placeholder : "img/grey.gif"});                
+      });                                                                   
+</script>  
+</head><body bgcolor="gray">
+<center>
+<%
+from glob import glob
+from subprocess import Popen, PIPE
+import os
+if 'pdf' in form:
+	pdf = form['pdf']
+	cmd = "pdfinfo \"%s\"" % pdf
+	cwd = "/var/www/https/books"	#point this to the directory where the PDF is located.
+	p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, cwd=cwd)
+	results, err = p.communicate()
+	req.write("<!-- cmd: %s, stdout: %s\nstderr: %s -->" % (cmd, results, err))
+	results = dict(a.split(':', 1) for a in results.split('\n') if ':' in a)
+	try:
+		pages = int(results['Pages'].strip())
+	except KeyError:
+		pages = 100
+	try:
+		width, height = results['Page size'].split("x")
+		width, height = float(width.strip()), float(height.split()[0])
+		if int(width) < 1024:
+			scale = float(1024) / width
+			width, height = scale * width, scale * height
+		width, height = map(int, (width, height))
+		width, height = map(str, (width, height))
+	except KeyError:
+		width, height = "100%", "150%"
+
+	%>
+	Jump to:
+<%
+	for page in map(str, range(pages)): %>
+		<a href="#<%= page %>"><%= page %></a>
+<%	
+	for page in map(str, range(pages)): %>
+		<a name="<%= page %>"><img src="pdftopng.psp?pdf=<%= pdf %>&page=<%= page %>" width="<%= width %>" height="<%= height %>"></a>
+		<br>
+	
+<%
+	#end
+%>
+<a href="<%= pdf %>">Download PDF</a>
+</center></body></html>
