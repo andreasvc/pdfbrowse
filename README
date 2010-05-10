@@ -1,0 +1,10 @@
+A simple AJAX PDF viewer and browser
+
+Requires:
+ - mod_python with python server pages (PSP)
+ - jquery
+ - jquery lazy load
+ - ImageMagick
+ - pdfinfo
+
+Drop the scripts in a directory with some PDFs and presto.
