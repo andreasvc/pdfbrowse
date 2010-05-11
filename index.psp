@@ -20,9 +20,10 @@ import os
 <table width="60%" bgcolor="#ffffff"><tr><td>
 <center><img src="/images/cubes3.jpg"><br>
 <strong>books</strong> beta<br><br>
-<form method=get submit=search.psp>
+<!--<form method=get submit=search.psp> #todo! integrate with tracker
 <input type=text> <input type=submit value=search>
-</form></center>
+</form>-->
+</center>
 <ul>
 <% os.chdir("/var/www/https/books/") 
 for a in sorted(glob("*.pdf")): %>
