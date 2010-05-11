@@ -17,15 +17,16 @@ else: pdf = "foo?"
 </head><body bgcolor="gray">
 <center>
 <%
-from glob import glob
 from subprocess import Popen, PIPE
 import os
 if 'pdf' in form:
 	pdf = form['pdf']
 	cmd = "pdfinfo \"%s\"" % pdf
 	cwd = "/var/www/https/books"	#point this to the directory where the PDF is located.
-	p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, cwd=cwd)
-	results, err = p.communicate()
+	if os.path.exists("/".join((cwd, pdf))):
+		p = Popen(cmd.split(), shell=False, stdout=PIPE, stderr=PIPE, cwd=cwd)
+		results, err = p.communicate()
+	else: results, err = "foo", "bar"
 	req.write("<!-- cmd: %s, stdout: %s\nstderr: %s -->" % (cmd, results, err))
 	results = dict(a.split(':', 1) for a in results.split('\n') if ':' in a)
 	try:
@@ -46,11 +47,15 @@ if 'pdf' in form:
 	%>
 	Jump to:
 <%
-	for page in map(str, range(pages)): %>
+	for page in map(str, range(1,pages+1)): %>
 		<a href="#<%= page %>"><%= page %></a>
+<%
+	#end
+%>
+	<br>
 <%	
 	for page in map(str, range(pages)): %>
-		<a name="<%= page %>"><img src="pdftopng.psp?pdf=<%= pdf %>&page=<%= page %>" width="<%= width %>" height="<%= height %>"></a>
+		<a name="<%= int(page)+1 %>"><img src="pdftopng.psp?pdf=<%= pdf %>&page=<%= page %>" width="<%= width %>" height="<%= height %>"></a>
 		<br>
 	
 <%

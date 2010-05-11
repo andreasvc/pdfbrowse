@@ -1,6 +1,8 @@
 <%
 req.no_cache = False
 req.headers_out.add("Expires", "Fri, 1 Jan 2038 05:00:00 GMT")
+del req.headers_out['Vary']
+
 %>
 <html><head><title>UNSTABLE | books</title>
 <script language="javascript" type="text/javascript" src="/javascript/jquery/jquery.js"></script>
@@ -10,11 +12,17 @@ req.headers_out.add("Expires", "Fri, 1 Jan 2038 05:00:00 GMT")
           $("img").lazyload({placeholder : "img/grey.gif"});                
       });                                                                   
 </script>  
+<!-- 
+Hello, World
+<% 
+#dir(req.headers_out) 
+#req.headers_out.items() 
+%> 
+-->
 </head><body bgcolor="gray">
 <center>
 <%
 from glob import glob
-from subprocess import Popen, PIPE
 import os
 %>
 <table width="60%" bgcolor="#ffffff"><tr><td>

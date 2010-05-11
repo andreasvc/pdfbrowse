@@ -1,13 +1,15 @@
 <%
 from subprocess import Popen, PIPE
+import os
 
-if 'pdf' in form and 'page' in form:
+cwd = "/var/www/https/books"
+if ('pdf' in form and 'page' in form 
+and os.path.exists("/".join((cwd, form['pdf'])))):
 	pdf = form['pdf']
 	page = form['page']
 	cmd = "convert -density 150 -colorspace HWB '%s[%d]' png:-" % (pdf, int(page))
-	cwd = "/var/www/https/books"
-	p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, cwd=cwd)
-
+	p = Popen(cmd.split(), shell=False, stdout=PIPE, stderr=PIPE, cwd=cwd)
+		
 	req.content_type = 'image/png'
 	req.no_cache = False
 	req.headers_out.add("Expires", "Fri, 1 Jan 2038 05:00:00 GMT")
