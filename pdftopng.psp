@@ -7,7 +7,7 @@ if ('pdf' in form and 'page' in form
 and os.path.exists("/".join((cwd, form['pdf'])))):
 	pdf = form['pdf']
 	page = form['page']
-	cmd = "convert -density 150 -colorspace HWB '%s[%d]' png:-" % (pdf, int(page))
+	cmd = "convert -density 150 -colorspace HWB %s[%d] png:-" % (pdf, int(page))
 	p = Popen(cmd.split(), shell=False, stdout=PIPE, stderr=PIPE, cwd=cwd)
 		
 	req.content_type = 'image/png'

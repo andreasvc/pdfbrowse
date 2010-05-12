@@ -21,7 +21,7 @@ from subprocess import Popen, PIPE
 import os
 if 'pdf' in form:
 	pdf = form['pdf']
-	cmd = "pdfinfo \"%s\"" % pdf
+	cmd = "pdfinfo %s" % pdf
 	cwd = "/var/www/https/books"	#point this to the directory where the PDF is located.
 	if os.path.exists("/".join((cwd, pdf))):
 		p = Popen(cmd.split(), shell=False, stdout=PIPE, stderr=PIPE, cwd=cwd)
