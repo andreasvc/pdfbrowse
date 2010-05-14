@@ -2,9 +2,12 @@
 # a script to display PDF files online.
 req.no_cache = False
 req.headers_out.add("Expires", "Fri, 1 Jan 2038 05:00:00 GMT")
+cwd = "/var/www/https/books"	#point this to the directory where the PDF is located.
 if 'pdf' in form:
 	pdf = form['pdf']
-else: pdf = "foo?"
+	existence = os.path.exists("/".join((cwd, pdf)))
+	if not existence: pdf = '/dev/null'
+else: pdf = "/dev/null"
 %>
 <html><head><title><%= pdf %></title>
 <script language="javascript" type="text/javascript" src="/javascript/jquery/jquery.js"></script>
@@ -19,47 +22,52 @@ else: pdf = "foo?"
 <%
 from subprocess import Popen, PIPE
 import os
-if 'pdf' in form:
-	pdf = form['pdf']
-	cmd = "pdfinfo %s" % pdf
-	cwd = "/var/www/https/books"	#point this to the directory where the PDF is located.
-	if os.path.exists("/".join((cwd, pdf))):
-		p = Popen(cmd.split(), shell=False, stdout=PIPE, stderr=PIPE, cwd=cwd)
-		results, err = p.communicate()
-	else: results, err = "foo", "bar"
-	req.write("<!-- cmd: %s, stdout: %s\nstderr: %s -->" % (cmd, results, err))
-	results = dict(a.split(':', 1) for a in results.split('\n') if ':' in a)
-	try:
-		pages = int(results['Pages'].strip())
-	except KeyError:
-		pages = 100
-	try:
-		width, height = results['Page size'].split("x")
-		width, height = float(width.strip()), float(height.split()[0])
-		if int(width) < 1024:
-			scale = float(1024) / width
-			width, height = scale * width, scale * height
-		width, height = map(int, (width, height))
-		width, height = map(str, (width, height))
-	except KeyError:
-		width, height = "100%", "150%"
+cmd = "pdfinfo %s" % pdf
+if existence:
+	p = Popen(cmd.split(), shell=False, stdout=PIPE, stderr=PIPE, cwd=cwd)
+	results, err = p.communicate()
+else: results, err = "foo", "file not found"
+#  re-enable this after doing quoting to avoid html injection
+#req.write("<!-- cmd: %s, stdout: %s\nstderr: %s -->" % (cmd, results, err))
+results = dict(a.split(':', 1) for a in results.split('\n') if ':' in a)
+try:
+	pages = int(results['Pages'].strip())
+except KeyError:
+	pages = 100
+try:
+	width, height = results['Page size'].split("x")
+	width, height = float(width.strip()), float(height.split()[0])
+	if int(width) < 1024:
+		scale = float(1024) / width
+		width, height = scale * width, scale * height
+	width, height = map(int, (width, height))
+	width, height = map(str, (width, height))
+except KeyError:
+	width, height = "100%", "150%"
 
-	%>
-	Jump to:
+if existence:
+%>
+	<a href="<%= pdf %>">Download PDF</a>. Jump to:
 <%
 	for page in map(str, range(1,pages+1)): %>
 		<a href="#<%= page %>"><%= page %></a>
 <%
 	#end
+#end
 %>
-	<br>
+<br>
 <%	
+if existence:
 	for page in map(str, range(pages)): %>
 		<a name="<%= int(page)+1 %>"><img src="pdftopng.psp?pdf=<%= pdf %>&page=<%= page %>" width="<%= width %>" height="<%= height %>"></a>
 		<br>
 	
+
 <%
 	#end
 %>
-<a href="<%= pdf %>">Download PDF</a>
+	<a href="<%= pdf %>">Download PDF</a>
+<%
+#end
+%>
 </center></body></html>
