@@ -34,6 +34,7 @@ import os
 </center>
 <ul>
 <% os.chdir("/var/www/https/books/") 
+# todo: do os.walk here to list pdfs recursively, multiple pages or threaded tree view?
 for a in sorted(glob("*.pdf")): %>
 		<a href="view.psp?pdf=<%= a %>"><img src="pdf.png" valign=middle><%= a %></a>
 		(<a href="http://docs.google.com/viewer?url=https://unstable.nl/books/<%= a %>">google quickview</a>) <br>
