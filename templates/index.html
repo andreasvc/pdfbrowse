@@ -9,7 +9,8 @@
 		<div style="width: 50%; text-align: left; ">	
 		<ul>
 {% for filename, title in files.items() %}
-			<li><a href="static/web/viewer.html?file={{ filename }}">{{ title }}</a>
+<a href="static/web/viewer.html?file={{ filename }}">
+<img src="pdf.png" valign=middle width=16 height=16> {{ title }}</a><br>
 {% endfor %}
 		</ul>
 		</div>

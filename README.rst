@@ -8,15 +8,15 @@ Requires:
 
 - Flask
 - tracker
-- PDF.js
 - PDFMiner
+- PDF.js
+- node (to build PDF.js)
 
 Installation::
 
-    apt-get install tracker tracker-utils python-pdfminer python-flask
+    apt-get install tracker tracker-utils python-pdfminer python-flask nodejs
     git clone --depth 1 git://github.com/andreasvc/pdfbrowse
     cd pdfbrowse/
-    git clone --depth 1 git://github.com/mozilla/pdf.js.git pdfjs
     sh setup.sh
 
 Place PDF files in ``static/files``, and add this directory to tracker's
