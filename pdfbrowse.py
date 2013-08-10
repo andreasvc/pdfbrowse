@@ -43,7 +43,7 @@ def view():
 		if not out:
 			return 'No results.'
 		prefix = '  file://%s/static/files/' % os.getcwd()
-		results = ['/static/files/' + a[len(prefix):]
+		results = ['static/files/' + a[len(prefix):]
 				for a in out.splitlines() if a.startswith(prefix)]
 		results = {'/' + a: gettitle(a) for a in results}
 		return render_template('index.html', files=results)
