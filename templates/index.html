@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<body>
+	<center>	
+		<form action=search method=get>
+			<input type=text name=q size=80>
+			<input type=submit value=search>
+		</form>
+
+		<div style="width: 50%; text-align: left; ">	
+		<ul>
+{% for filename, title in files.items() %}
+			<li><a href="static/web/viewer.html?file={{ filename }}">{{ title }}</a>
+{% endfor %}
+		</ul>
+		</div>
+	</center>
+</body>
