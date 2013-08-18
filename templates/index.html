@@ -1,18 +1,37 @@
 <!DOCTYPE html>
+<title>pdfbrowse{{ ': %s' % query if query }}</title>
+<style>
+body {
+	background-color: gray;
+	font-family: sans-serif;
+}
+h1 { font-weight: normal; }
+.centered {
+	text-align: center;
+	background-color: white;
+	width: 50%;
+	padding: 2em;
+	margin: auto;
+	margin-top: 2em;
+}
+.box {
+	text-align: left;
+	padding-top: 1em;
+}
+</style>
 <body>
-	<center>	
+   <div class=centered>
+		<h1>PDF Browser</h1>
 		<form action=search method=get>
 			<input type=text name=q size=80>
 			<input type=submit value=search>
 		</form>
-
-		<div style="width: 50%; text-align: left; ">	
-		<ul>
+		<div class=box>
+			<pre>{{ err }}</pre>
 {% for filename, title in files.items() %}
-<a href="static/web/viewer.html?file={{ filename }}">
-<img src="pdf.png" valign=middle width=16 height=16> {{ title }}</a><br>
+			<a href="{{ 'static/web/viewer.html?file=' if filename.endswith('pdf') or filename.endswith('PDF') }}{{ filename }}">
+			<img src="static/pdf.png" valign=middle width=16 height=16> {{ title }}</a><br>
 {% endfor %}
-		</ul>
 		</div>
-	</center>
+   </div>
 </body>
